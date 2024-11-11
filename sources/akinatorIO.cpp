@@ -14,7 +14,7 @@ static bool GetLine(char* buffer, const size_t bufferSize);
 
 bool GetObject(char* objectBuffer)
 {
-    printf("Enter name of your ogject.\n");
+    printf("Enter name of your object.\n");
     if (GetLine(objectBuffer, MAX_OBJECT_LENGTH))
         return true;
 
@@ -24,7 +24,7 @@ bool GetObject(char* objectBuffer)
 
 bool GetProperty(char* propertyBuffer, const char* object)
 {
-    printf("Enter any property of %s\n.", object);
+    printf("Enter any property of %s.\n", object);
     if (GetLine(propertyBuffer, MAX_OBJECT_LENGTH))
         return true;
 

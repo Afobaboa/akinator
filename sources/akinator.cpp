@@ -60,20 +60,30 @@ void AkinatorPlay()
 
 static int CompareObjects(const void* firstObject, const void* secondObject)
 {
+    printf("Is it %s?\n"
+           "[Y]es, [N]o.\n", 
+           (const char*) secondObject);
+    
+    char answer = '\0';
+    scanf("%c", &answer);
 
+    if (answer == 'Y')
+        return 0;
+    
+    return -1;
 }
 
 
 static void PrintObject(FILE* file, const void* object)
 {
-
+    fprintf(file, "%s", (const char*) object);
 }
 
 
 // TODO
 static akinatorMode_t AkinatorGetMode(Akinator* akinator)
 {
-    akinator->mode = AKINATOR_GUESS; 
+    return AKINATOR_GUESS; 
 }
 
 
@@ -94,7 +104,7 @@ static void AkinatorRunMode(Akinator* akinator)
         break;
 
     default:
-        ColoredPrintf(RED, "Wrong mode\n");
+        ColoredPrintf(RED, "Wrong mode: %d\n", akinator->mode);
     }
 }
 
@@ -142,5 +152,12 @@ static bool AkinatorSetFirstObject(Akinator* akinator)
 
 static bool AkinatorGuess(Akinator* akinator)
 {
-    
+    BinTreeNode* questionNode = NULL;
+    treeDirection_t direction  = BinTreeNodeParentFind(akinator->binTree, NULL, CompareObjects, 
+                                                                                    &questionNode);
+    if (direction == RIGHT)
+        printf("Yeah!\n");
+
+    else if (direction == LEFT)
+        printf("BAN\n");
 }
