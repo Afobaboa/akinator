@@ -69,7 +69,11 @@ static int CompareObjects(const void* firstObject, const void* secondObject)
 
     if (answer == 'Y')
         return 0;
+
+    if (answer == (char) EOF)
+        printf("EOF\n");
     
+    printf("> %c [%d]\n\n", answer, answer);
     return -1;
 }
 
@@ -145,13 +149,19 @@ static bool AkinatorSetFirstObject(Akinator* akinator)
     char property[MAX_OBJECT_LENGTH] = "";
     GetProperty(property, object);
 
-    BIN_TREE_INIT(&akinator->binTree, sizeof(char*), &property, CompareObjects);
-    BinTreeInsert(akinator->binTree, &object);
+    if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), &property, CompareObjects) ||
+        !BinTreeInsert(akinator->binTree, &object))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 
 static bool AkinatorGuess(Akinator* akinator)
 {
+    ColoredPrintf(WHITE, "Guessing...\n");
     BinTreeNode* questionNode = NULL;
     treeDirection_t direction  = BinTreeNodeParentFind(akinator->binTree, NULL, CompareObjects, 
                                                                                     &questionNode);
@@ -160,4 +170,6 @@ static bool AkinatorGuess(Akinator* akinator)
 
     else if (direction == LEFT)
         printf("BAN\n");
+
+    return false;
 }
