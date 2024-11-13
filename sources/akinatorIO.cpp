@@ -52,6 +52,6 @@ static bool GetLine(char* buffer, const size_t bufferSize)
     }
 
     buffer[bufferSize - 1] = '\0';
-    printf("<%s> = %p at %p\n", buffer, buffer, &buffer);
+    // printf("<%s> = %p at %p\n", buffer, buffer, &buffer);
     return gettingResult;
 }

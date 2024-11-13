@@ -46,6 +46,7 @@ static bool AkinatorGuess(Akinator* akinator);
 
 void AkinatorPlay()
 {
+    ColoredPrintf(WHITE, "It is Akinator!\n");
     Akinator akinator = {};
     
     akinator.binTree = NULL;
@@ -67,9 +68,9 @@ static int CompareObjects(const void* firstObject, const void* secondObject)
            *((const char**) secondObject));
     
     char answer = (char) getchar();
-
-    char tempChar = (char) getchar();
-    printf(">~~~ %c [%d]\n\n", tempChar, tempChar);
+    //                                                 TODO
+    char tempChar = (char) getchar(); // to skip '\n', TODO: add skipping spaces
+    // printf(">~~~ %c [%d]\n\n", tempChar, tempChar);
 
     if (answer == 'Y')
         return 0;
@@ -77,7 +78,7 @@ static int CompareObjects(const void* firstObject, const void* secondObject)
     if (answer == (char) EOF)
         printf("EOF\n");
     
-    printf("> %c [%d]\n\n", answer, answer);
+    // printf("> %c [%d]\n\n", answer, answer);
     return -1;
 }
 
@@ -153,9 +154,11 @@ static void AkinatorRunDefine(Akinator* akinator)
 
 static bool AkinatorSetFirstObject(Akinator* akinator)
 {
+    ColoredPrintf(WHITE, "Setting first object\n");
+
     char* object = (char*) calloc(MAX_OBJECT_LENGTH, sizeof(char));
     GetObject(object);
-    ColoredPrintf(YELLOW, "Object = %p at %p\n", object, &object);
+    // ColoredPrintf(YELLOW, "Object = %p at %p\n", object, &object);
     
     char* property = (char*) calloc(MAX_OBJECT_LENGTH, sizeof(char));
     GetProperty(property, object);
@@ -179,7 +182,7 @@ static bool AkinatorGuess(Akinator* akinator)
     if (direction == RIGHT)
         printf("Yeah!\n");
 
-    else if (direction == LEFT)
+    else
         printf("BAN\n");
 
     return false;
