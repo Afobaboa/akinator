@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "binTree.h"
 #include "akinator.h"
@@ -62,7 +63,7 @@ static int CompareObjects(const void* firstObject, const void* secondObject)
 {
     printf("Is it %s?\n"
            "[Y]es, [N]o.\n", 
-           (const char*) secondObject);
+           *((const char**) secondObject));
     
     char answer = (char) getchar();
 
@@ -145,14 +146,15 @@ static void AkinatorRunDefine(Akinator* akinator)
 
 static bool AkinatorSetFirstObject(Akinator* akinator)
 {
-    char object[MAX_OBJECT_LENGTH] = {};
+    char* object = (char*) calloc(MAX_OBJECT_LENGTH, sizeof(char));
     GetObject(object);
+    ColoredPrintf(YELLOW, "Object = %p at %p\n", object, &object);
     
-    char property[MAX_OBJECT_LENGTH] = {};
+    char* property = (char*) calloc(MAX_OBJECT_LENGTH, sizeof(char));
     GetProperty(property, object);
 
-    if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), property, CompareObjects) ||
-        !BinTreeInsert(akinator->binTree, object))
+    if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), &property, CompareObjects) ||
+        !BinTreeInsert(akinator->binTree, &object))
     {
         return false;
     }
