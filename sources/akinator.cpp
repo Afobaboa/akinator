@@ -26,6 +26,7 @@ struct Akinator
 
 
 static int CompareObjects(const void* firstObject, const void* secondObject);
+static void DeleteObject(void* objectPtr);
 static void PrintObject(FILE* file, const void* object);
 
 static akinatorMode_t AkinatorGetMode();
@@ -52,7 +53,7 @@ void AkinatorPlay()
 
     AkinatorRunMode(&akinator);
 
-    BinTreeDelete(&akinator.binTree);
+    BinTreeDelete(&akinator.binTree, DeleteObject);
 }
 
 
@@ -78,6 +79,12 @@ static int CompareObjects(const void* firstObject, const void* secondObject)
     
     printf("> %c [%d]\n\n", answer, answer);
     return -1;
+}
+
+
+static void DeleteObject(void* objectPtr)
+{
+    free(*((char**) objectPtr));
 }
 
 
@@ -154,7 +161,7 @@ static bool AkinatorSetFirstObject(Akinator* akinator)
     GetProperty(property, object);
 
     if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), &property, CompareObjects) ||
-        !BinTreeInsert(akinator->binTree, &object))
+        !BinTreeInsert(akinator->binTree, &object, CompareObjects))
     {
         return false;
     }
