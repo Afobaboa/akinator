@@ -36,9 +36,12 @@ static void AkinatorRunMode(Akinator* akinator);
 static void AkinatorRunGuess(Akinator* akinator);
 static void AkinatorRunCompare(Akinator* akinator);
 static void AkinatorRunDefine(Akinator* akinator);
+// TODO change name
 
 static bool AkinatorSetFirstObject(Akinator* akinator);
 static bool AkinatorGuess(Akinator* akinator);
+
+static void AkinatorAddObject(Akinator* akinator, BinTreeNode* questionNode);
 
 
 //--------------------------------------------------------------------------------------------------
@@ -60,16 +63,18 @@ void AkinatorPlay()
 
 //--------------------------------------------------------------------------------------------------
 
-
+// TODO enum
+// TODO change name
 static int CompareObjects(const void* firstObject, const void* secondObject)
 {
     printf("Is it %s?\n"
            "[Y]es, [N]o.\n", 
            *((const char**) secondObject));
     
+    // TODO think scanf("%c ");
     char answer = (char) getchar();
-    //                                                 TODO
-    char tempChar = (char) getchar(); // to skip '\n', TODO: add skipping spaces
+
+    char tempChar = (char) getchar(); // to skip '\n', // TODO: add skipping spaces
     // printf(">~~~ %c [%d]\n\n", tempChar, tempChar);
 
     if (answer == 'Y')
@@ -183,7 +188,25 @@ static bool AkinatorGuess(Akinator* akinator)
         printf("Yeah!\n");
 
     else
-        printf("BAN\n");
+        AkinatorAddObject(akinator, questionNode);
 
-    return false;
+    return true;
+}
+
+
+// TODO typedef char* akinatorObject_t; and property_t. I can use inheritance
+// TODO add NULL checkers when I create objects
+// TODO add getting of child object
+static void AkinatorAddObject(Akinator* akinator, BinTreeNode* questionNode)
+{
+    char* newObject = (char*) calloc(MAX_OBJECT_LENGTH, sizeof(char));
+    GetObject(newObject);
+
+    char* newProperty = (char*) calloc(MAX_OBJECT_LENGTH, sizeof(char));
+    GetProperty(newProperty, newObject);
+
+    BinTreeNode* newNode =  BinTreeInsertAfter(akinator->binTree, &newProperty, questionNode, 
+                                               CompareObjects, CompareObjects);
+
+    BinTreeInsertAfter(akinator->binTree, &newObject, newNode, CompareObjects, CompareObjects);
 }
