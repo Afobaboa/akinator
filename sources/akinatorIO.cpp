@@ -40,7 +40,7 @@ static bool GetLine(char* buffer, const size_t bufferSize)
     bool gettingResult = false;
     for (size_t charIndex = 0; charIndex < bufferSize; charIndex++)
     {
-        char nextChar = getchar();
+        char nextChar = (char) getchar();
         if (nextChar == '\n')
         {
             gettingResult = true;
@@ -51,5 +51,7 @@ static bool GetLine(char* buffer, const size_t bufferSize)
         buffer[charIndex] = nextChar;
     }
 
+    buffer[bufferSize - 1] = '\0';
+    printf("<%s> = %p at %p\n", buffer, buffer, &buffer);
     return gettingResult;
 }

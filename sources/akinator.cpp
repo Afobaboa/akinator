@@ -24,10 +24,10 @@ struct Akinator
 };
 
 
-static int CompareObjects(void* firstObject, void* secondObject);
-static void PrintObject(FILE* file, void* object);
+static int CompareObjects(const void* firstObject, const void* secondObject);
+static void PrintObject(FILE* file, const void* object);
 
-static akinatorMode_t AkinatorGetMode(Akinator* akinator);
+static akinatorMode_t AkinatorGetMode();
 
 static void AkinatorRunMode(Akinator* akinator);
 
@@ -47,7 +47,7 @@ void AkinatorPlay()
     Akinator akinator = {};
     
     akinator.binTree = NULL;
-    akinator.mode    = AkinatorGetMode(&akinator);
+    akinator.mode    = AkinatorGetMode();
 
     AkinatorRunMode(&akinator);
 
@@ -64,8 +64,10 @@ static int CompareObjects(const void* firstObject, const void* secondObject)
            "[Y]es, [N]o.\n", 
            (const char*) secondObject);
     
-    char answer = '\0';
-    scanf("%c", &answer);
+    char answer = (char) getchar();
+
+    char tempChar = (char) getchar();
+    printf(">~~~ %c [%d]\n\n", tempChar, tempChar);
 
     if (answer == 'Y')
         return 0;
@@ -85,7 +87,7 @@ static void PrintObject(FILE* file, const void* object)
 
 
 // TODO
-static akinatorMode_t AkinatorGetMode(Akinator* akinator)
+static akinatorMode_t AkinatorGetMode()
 {
     return AKINATOR_GUESS; 
 }
@@ -143,14 +145,14 @@ static void AkinatorRunDefine(Akinator* akinator)
 
 static bool AkinatorSetFirstObject(Akinator* akinator)
 {
-    char object[MAX_OBJECT_LENGTH] = "";
+    char object[MAX_OBJECT_LENGTH] = {};
     GetObject(object);
     
-    char property[MAX_OBJECT_LENGTH] = "";
+    char property[MAX_OBJECT_LENGTH] = {};
     GetProperty(property, object);
 
-    if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), &property, CompareObjects) ||
-        !BinTreeInsert(akinator->binTree, &object))
+    if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), property, CompareObjects) ||
+        !BinTreeInsert(akinator->binTree, object))
     {
         return false;
     }
