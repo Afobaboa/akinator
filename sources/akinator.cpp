@@ -11,11 +11,27 @@
 
 enum AKINATOR_MODES
 {
+    AKINATOR_WRONG_MODE,
+
     AKINATOR_GUESS,
     AKINATOR_COMPARE,
-    AKINATOR_DEFINE
+    AKINATOR_GET_DEFINITION, 
+
+    AKINATOR_MODE_COUNT
 };
 typedef enum AKINATOR_MODES akinatorMode_t;
+
+
+enum END_STATUSES
+{
+    END_STATUS_WRONG,
+
+    REPEAT,
+    EXIT,
+
+    END_STATUSES_COUNT
+};
+typedef enum END_STATUSES endStatus_t;
 
 
 struct Akinator
@@ -23,6 +39,9 @@ struct Akinator
     binTree_t binTree;
     akinatorMode_t mode;
 };
+
+
+//--------------------------------------------------------------------------------------------------
 
 
 static int CompareObjects(const void* firstObject, const void* secondObject);
@@ -53,9 +72,21 @@ void AkinatorPlay()
     Akinator akinator = {};
     
     akinator.binTree = NULL;
-    akinator.mode    = AkinatorGetMode();
 
-    AkinatorRunMode(&akinator);
+    for(;;)
+    {
+        akinator.mode = AkinatorGetMode();
+        AkinatorRunMode(&akinator);
+
+        
+        printf("%d - choose mode.\n" // endStatus = EndStatusGet("choose mode.", "exit.");
+               "%d - exit.\n",
+               REPEAT,
+               EXIT);
+
+        endStatus_t endStatus = END_STATUS_WRONG;
+        
+    }
 
     BinTreeDelete(&akinator.binTree, __AkinatorStringDelete);
 }
@@ -97,7 +128,24 @@ static inline void __AkinatorStringDelete(void* akinatorStringPtr)
 // TODO
 static akinatorMode_t AkinatorGetMode()
 {
-    return AKINATOR_GUESS; 
+    printf("Choose mode:\n");
+
+    for (;;)
+    {
+        printf("%d - guess your objects.\n"
+               "%d - compare your objects.\n"
+               "%d - get definition of your object.\n",
+               AKINATOR_GUESS,
+               AKINATOR_COMPARE,
+               AKINATOR_GET_DEFINITION);
+
+        akinatorMode_t mode = AKINATOR_WRONG_MODE;
+        scanf("%d", &mode);
+        if (mode > AKINATOR_WRONG_MODE && mode < AKINATOR_MODE_COUNT)
+            return mode;
+        else
+            printf("You wrote wrong mode. Try choose again.\n");
+    }
 }
 
 
@@ -113,10 +161,11 @@ static void AkinatorRunMode(Akinator* akinator)
         AkinatorRunCompare(akinator);
         break;
 
-    case AKINATOR_DEFINE:
+    case AKINATOR_GET_DEFINITION:
         AkinatorRunDefine(akinator);
         break;
 
+    case AKINATOR_WRONG_MODE:
     default:
         ColoredPrintf(RED, "Wrong mode: %d\n", akinator->mode);
     }
