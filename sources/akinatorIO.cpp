@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "akinatorIO.h"
 
@@ -6,52 +7,71 @@
 //--------------------------------------------------------------------------------------------------
 
 
-static bool GetLine(char* buffer, const size_t bufferSize);
+static akinatorString_t AkinatorStringInit();
 
 
 //--------------------------------------------------------------------------------------------------
 
 
-bool GetObject(char* objectBuffer)
+akinatorString_t AkinatorStringCreate()
+{
+    return (akinatorString_t) calloc(MAX_AKINATOR_STRING_LENGTH, sizeof(char));
+}
+
+
+void AkinatorStringDelete(akinatorString_t string)
+{
+    free(string);
+}
+
+
+akinatorObject_t AkinatorObjectGet()
 {
     printf("Enter name of your object.\n");
-    if (GetLine(objectBuffer, MAX_OBJECT_LENGTH))
-        return true;
-
-    return false;
+    return AkinatorStringInit();
 }
 
 
-bool GetProperty(char* propertyBuffer, const char* object)
+akinatorProperty_t AkinatorPropertyGet(const akinatorObject_t object)
 {
-    printf("Enter any property of %s.\n", object);
-    if (GetLine(propertyBuffer, MAX_OBJECT_LENGTH))
-        return true;
-
-    return false;
+    printf("Enter any property of " PRIakinObj ".\n", object);
+    return AkinatorStringInit();
 }
 
 
 //--------------------------------------------------------------------------------------------------
 
 
-static bool GetLine(char* buffer, const size_t bufferSize)
+static akinatorString_t AkinatorStringInit()
 {
+    akinatorString_t string = AkinatorStringCreate();
+    if (string == NULL)
+        return NULL;
+
     bool gettingResult = false;
-    for (size_t charIndex = 0; charIndex < bufferSize; charIndex++)
+    for (size_t charIndex = 0; charIndex < MAX_AKINATOR_STRING_LENGTH; charIndex++)
     {
-        char nextChar = (char) getchar();
+        int nextChar = getchar();
         if (nextChar == '\n')
         {
             gettingResult = true;
-            buffer[charIndex] = '\0';
+            string[charIndex] = '\0';
             break;
         }
 
-        buffer[charIndex] = nextChar;
+        if (nextChar == EOF)
+            break;
+
+        string[charIndex] = (char) nextChar;
     }
 
-    buffer[bufferSize - 1] = '\0';
-    // printf("<%s> = %p at %p\n", buffer, buffer, &buffer);
-    return gettingResult;
+    string[MAX_AKINATOR_STRING_LENGTH - 1] = '\0';
+
+    if (!gettingResult)
+    {
+        AkinatorStringDelete(string);
+        return NULL;
+    }
+
+    return string;
 }

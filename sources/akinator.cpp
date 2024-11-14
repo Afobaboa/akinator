@@ -26,7 +26,7 @@ struct Akinator
 
 
 static int CompareObjects(const void* firstObject, const void* secondObject);
-static void DeleteObject(void* objectPtr);
+static inline void __AkinatorStringDelete(void* akinatorStringPtr);
 static void PrintObject(FILE* file, const void* object);
 
 static akinatorMode_t AkinatorGetMode();
@@ -57,7 +57,7 @@ void AkinatorPlay()
 
     AkinatorRunMode(&akinator);
 
-    BinTreeDelete(&akinator.binTree, DeleteObject);
+    BinTreeDelete(&akinator.binTree, __AkinatorStringDelete);
 }
 
 
@@ -88,15 +88,9 @@ static int CompareObjects(const void* firstObject, const void* secondObject)
 }
 
 
-static void DeleteObject(void* objectPtr)
+static inline void __AkinatorStringDelete(void* akinatorStringPtr)
 {
-    free(*((char**) objectPtr));
-}
-
-
-static void PrintObject(FILE* file, const void* object)
-{
-    fprintf(file, "%s", (const char*) object);
+    AkinatorStringDelete(*((akinatorString_t*) akinatorStringPtr));
 }
 
 
@@ -161,12 +155,8 @@ static bool AkinatorSetFirstObject(Akinator* akinator)
 {
     ColoredPrintf(WHITE, "Setting first object\n");
 
-    char* object = (char*) calloc(MAX_OBJECT_LENGTH, sizeof(char));
-    GetObject(object);
-    // ColoredPrintf(YELLOW, "Object = %p at %p\n", object, &object);
-    
-    char* property = (char*) calloc(MAX_OBJECT_LENGTH, sizeof(char));
-    GetProperty(property, object);
+    const akinatorObject_t   object = AkinatorObjectGet();
+    const akinatorProperty_t property = AkinatorPropertyGet(object);
 
     if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), &property, CompareObjects) ||
         !BinTreeInsert(akinator->binTree, &object, CompareObjects))
@@ -199,11 +189,8 @@ static bool AkinatorGuess(Akinator* akinator)
 // TODO add getting of child object
 static void AkinatorAddObject(Akinator* akinator, BinTreeNode* questionNode)
 {
-    char* newObject = (char*) calloc(MAX_OBJECT_LENGTH, sizeof(char));
-    GetObject(newObject);
-
-    char* newProperty = (char*) calloc(MAX_OBJECT_LENGTH, sizeof(char));
-    GetProperty(newProperty, newObject);
+    akinatorObject_t   newObject   = AkinatorObjectGet();
+    akinatorProperty_t newProperty = AkinatorPropertyGet(newObject);
 
     BinTreeNode* newNode =  BinTreeInsertAfter(akinator->binTree, &newProperty, questionNode, 
                                                CompareObjects, CompareObjects);
