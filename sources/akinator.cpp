@@ -76,6 +76,7 @@ void AkinatorPlay()
     }
 
     ColoredPrintf(WHITE, "Goodbye!\n");
+    // TODO AkinatorDelete(&akinator);
     BinTreeDelete(&akinator.binTree, __AkinatorStringDelete);
 }
 
@@ -141,9 +142,9 @@ static akinatorMode_t AkinatorGetMode()
                AKINATOR_GET_DEFINITION);
 
         akinatorMode_t mode = AKINATOR_WRONG_MODE;
-        scanf("%d", (int*) &mode);
-        SkipSpaces();
-        printf("\n");
+        scanf(" %d", (int*) &mode);
+        // SkipSpaces();
+        printf("Successfully got it!\n");
 
         if (mode > AKINATOR_WRONG_MODE && mode < AKINATOR_MODE_COUNT)
             return mode;
@@ -205,7 +206,7 @@ static void AkinatorRunCompare(Akinator* akinator)
 }
 
 
-// TODO
+// TODO Remove stack
 static void AkinatorRunGetDefinition(Akinator* akinator)
 {
     if (akinator->binTree == NULL)

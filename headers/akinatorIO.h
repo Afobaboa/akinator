@@ -25,6 +25,7 @@ endStatus_t EndStatusGet(const char* repeatDescription, const char* exitDescript
 //--------------------------------------------------------------------------------------------------
 
 
+// TODO replce akinatorString_t to char* 
 typedef char* akinatorString_t;
 static const size_t MAX_AKINATOR_STRING_LENGTH = 128;
 

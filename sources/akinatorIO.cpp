@@ -86,6 +86,14 @@ static akinatorString_t AkinatorStringInit()
     if (string == NULL)
         return NULL;
 
+    // TODO scanf
+    // char buffer[5] = {1, 2, 3, 4};
+    // scanf(" %4[^\n]s", buffer);
+    // for (int i = 0; i < 4; i++)
+    //     printf("%d ", buffer[i]);
+    
+    // printf("\nbuffer = <%s>\n", buffer);
+
     bool gettingResult = false;
     for (size_t charIndex = 0; charIndex < MAX_AKINATOR_STRING_LENGTH; charIndex++)
     {
