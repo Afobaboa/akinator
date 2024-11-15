@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "binTree.h"
 #include "akinator.h"
@@ -32,9 +33,10 @@ struct Akinator
 //--------------------------------------------------------------------------------------------------
 
 
-static int CompareObjects(const void* firstObject, const void* secondObject);
+static int CompareObjects(const void* firstObjectPtr, const void* secondObjectPtr);
+static inline int IsObjectsEqual(const void* firstObjectPtr, const void* secondObjectPtr);
 static inline void __AkinatorStringDelete(void* akinatorStringPtr);
-static void PrintObject(FILE* file, const void* object);
+static void PrintObject(const void* objectPtr);
 
 static akinatorMode_t AkinatorGetMode();
 
@@ -81,13 +83,22 @@ void AkinatorPlay()
 //--------------------------------------------------------------------------------------------------
 
 
-static int CompareObjects(const void* firstObject, const void* secondObject)
+static int CompareObjects(const void* firstObjectPtr, const void* secondObjectPtr)
 {
-    printf("Is it %s?\n"
-           "[Y]es, [N]o.\n", 
-           *((const char**) secondObject));
-    
-    // TODO think scanf("%c ");
+    if (firstObjectPtr != NULL)
+    {
+        printf("Is %s %s?\n"
+               "[Y]es, [N]o.\n", 
+               *((const char**) firstObjectPtr),
+               *((const char**) secondObjectPtr));
+    }
+    else
+    {
+        printf("Is it %s?\n"
+               "[Y]es, [N]o\n", 
+               *((const char**) secondObjectPtr));
+    }
+
     int answer = getchar();
     SkipSpaces();
 
@@ -99,9 +110,21 @@ static int CompareObjects(const void* firstObject, const void* secondObject)
 }
 
 
+static inline int IsObjectsEqual(const void* firstObjectPtr, const void* secondObjectPtr)
+{
+    return strcmp(*((const char**) firstObjectPtr), *((const char**) secondObjectPtr));
+}
+
+
 static inline void __AkinatorStringDelete(void* akinatorStringPtr)
 {
     AkinatorStringDelete(*((akinatorString_t*) akinatorStringPtr));
+}
+
+
+static void PrintObject(const void* objectPtr)
+{
+    printf("It is %s\n", *((const akinatorString_t*) objectPtr));
 }
 
 
@@ -185,7 +208,23 @@ static void AkinatorRunCompare(Akinator* akinator)
 // TODO
 static void AkinatorRunGetDefinition(Akinator* akinator)
 {
+    if (akinator->binTree == NULL)
+    {
+        printf("I don't know any objects. Run guess mode.\n");
+        return;
+    }
 
+    akinatorObject_t object = AkinatorObjectGet();
+    binTreePath_t path = BinTreeFindPath(akinator->binTree, &object, IsObjectsEqual);
+    AkinatorStringDelete(object);
+
+    if (path == NULL)
+    {
+        printf("Sorry bro, but I don't know anything about this object.\n");
+        return;
+    }
+
+    BinTreePathProcess(akinator->binTree, &path, PrintObject);
 }
 
 

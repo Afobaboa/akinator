@@ -54,7 +54,7 @@ akinatorObject_t AkinatorObjectGet()
 
 akinatorProperty_t AkinatorPropertyGet(const akinatorObject_t object)
 {
-    printf("Enter any property of " PRIakinObj ".\n", object);
+    printf("Enter any property of %" PRIakinObj ".\n", object);
     return AkinatorStringInit();
 }
 

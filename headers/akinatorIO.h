@@ -33,10 +33,10 @@ void AkinatorStringDelete(akinatorString_t string);
 
 
 typedef akinatorString_t akinatorObject_t;
-#define PRIakinObj "%s" // PRIakinatorObject
+#define PRIakinObj "s" // PRIakinatorObject
 
 typedef akinatorString_t akinatorProperty_t;
-#define PRIakinPpt "%s" // PRIakinatorProperty
+#define PRIakinPpt "s" // PRIakinatorProperty
 
 akinatorObject_t AkinatorObjectGet();
 akinatorProperty_t AkinatorPropertyGet(const akinatorObject_t object);

@@ -26,12 +26,12 @@ bounds,enum,float-cast-overflow,float-divide-by-zero,$\
 integer-divide-by-zero,leak,nonnull-attribute,null,object-size,$\
 return,returns-nonnull-attribute,shift,signed-integer-overflow,$\
 undefined,unreachable,vla-bound,vptr $\
--Iheaders -IbinTree/headers -IbinTree/logPrinter
+-Iheaders -IbinTree/headers -IbinTree/logPrinter -IbinTree/stack/headers
 
 
 # Flags for release version compilation
 RELEASE_FLAGS=-Wmissing-declarations -Wempty-body -DNDEBUG -DLOG_SWITCH_OFF $\
--Iheaders -IbinTree/headers -IbinTree/logPrinter
+-Iheaders -IbinTree/headers -IbinTree/logPrinter -IbinTree/stack/headers
 
 
 FLAGS=
@@ -101,6 +101,25 @@ $(OBJECTS_DIR)/%.o: $(BIN_TREE_SOURCE_DIR)/%.cpp $(BIN_TREE_HEADERS) $(LOG_HEADE
 #---------------------------------------------------------------------------------------------------
 
 
+# stack
+STACK_SOURCE_DIR=binTree/stack/sources
+STACK_HEADER_DIR=binTree/stack/headers
+
+STACK_SOURCE_FILES=canary.cpp hash.cpp myRecalloc.cpp stack.cpp
+STACK_HEADER_FILES=canary.h hash.h myRecalloc.h stack.h stackConfigs.h
+
+STACK_SOURCES=$(patsubst %.cpp,$(STACK_SOURCE_DIR)/%.cpp,$(STACK_SOURCE_FILES))
+STACK_HEADERS=$(patsubst %.h,$(STACK_HEADER_DIR)/%.h,$(STACK_HEADER_FILES))
+STACK_OBJECTS=$(patsubst %.cpp,$(OBJECTS_DIR)/%.o,$(STACK_SOURCE_FILES))
+
+
+$(OBJECTS_DIR)/%.o: $(STACK_SOURCE_DIR)/%.cpp $(STACK_HEADERS) $(LOG_HEADERS)
+	@$(CC) -c $(FLAGS) $< -o $@
+
+
+#---------------------------------------------------------------------------------------------------
+
+
 # akinator
 AKINATOR_SOURCE_DIR=sources
 AKINATOR_HEADER_DIR=headers
@@ -125,8 +144,8 @@ MAIN_SOURCE_DIR=$(AKINATOR_SOURCE_DIR)
 MAIN_SOURCE=$(MAIN_SOURCE_DIR)/main.cpp
 MAIN_OBJECT=$(patsubst $(MAIN_SOURCE_DIR)/%.cpp, $(OBJECTS_DIR)/%.o, $(MAIN_SOURCE))
 
-OBJECTS=$(MAIN_OBJECT) $(AKINATOR_OBJECTS) $(BIN_TREE_OBJECTS) $(LOG_OBJECTS)
-HEADERS=$(AKINATOR_HEADERS) $(BIN_TREE_HEADERS) $(LOG_HEADERS)
+OBJECTS=$(MAIN_OBJECT) $(AKINATOR_OBJECTS) $(BIN_TREE_OBJECTS) $(STACK_OBJECTS) $(LOG_OBJECTS)
+HEADERS=$(AKINATOR_HEADERS) $(BIN_TREE_HEADERS) $(STACK_HEADERS) $(LOG_HEADERS)
 
 print:
 	echo $(OBJECTS)
