@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,6 +12,25 @@ static akinatorString_t AkinatorStringInit();
 
 
 //--------------------------------------------------------------------------------------------------
+
+
+endStatus_t EndStatusGet(const char* repeatDescription, const char* exitDescription)
+{
+    for (;;)
+    {
+        printf("%d - %s\n"
+               "%d - %s\n", 
+               REPEAT, repeatDescription,
+               EXIT,   exitDescription);
+
+        endStatus_t endStatus = END_STATUS_WRONG;
+        scanf("%d", (int*) &endStatus);
+        if (endStatus > END_STATUS_WRONG && endStatus < END_STATUSES_COUNT)
+            return endStatus;
+        
+        printf("Wrong! Choose again.");
+    }
+}
 
 
 akinatorString_t AkinatorStringCreate()
@@ -36,6 +56,24 @@ akinatorProperty_t AkinatorPropertyGet(const akinatorObject_t object)
 {
     printf("Enter any property of " PRIakinObj ".\n", object);
     return AkinatorStringInit();
+}
+
+
+void SkipSpaces()
+{
+    int nextChar = 0;
+    for (;;)
+    {
+        nextChar = getchar();
+        if (!isspace(nextChar))
+        {
+            ungetc(nextChar, stdin);
+            break;
+        }
+
+        if (nextChar == '\n')
+            break;
+    }
 }
 
 

@@ -22,18 +22,6 @@ enum AKINATOR_MODES
 typedef enum AKINATOR_MODES akinatorMode_t;
 
 
-enum END_STATUSES
-{
-    END_STATUS_WRONG,
-
-    REPEAT,
-    EXIT,
-
-    END_STATUSES_COUNT
-};
-typedef enum END_STATUSES endStatus_t;
-
-
 struct Akinator
 {
     binTree_t binTree;
@@ -54,7 +42,7 @@ static void AkinatorRunMode(Akinator* akinator);
 
 static void AkinatorRunGuess(Akinator* akinator);
 static void AkinatorRunCompare(Akinator* akinator);
-static void AkinatorRunDefine(Akinator* akinator);
+static void AkinatorRunGetDefinition(Akinator* akinator);
 // TODO change name
 
 static bool AkinatorSetFirstObject(Akinator* akinator);
@@ -68,6 +56,8 @@ static void AkinatorAddObject(Akinator* akinator, BinTreeNode* questionNode);
 
 void AkinatorPlay()
 {
+    setvbuf(stdin, NULL, _IONBF, 0);
+
     ColoredPrintf(WHITE, "It is Akinator!\n");
     Akinator akinator = {};
     
@@ -78,24 +68,19 @@ void AkinatorPlay()
         akinator.mode = AkinatorGetMode();
         AkinatorRunMode(&akinator);
 
-        
-        printf("%d - choose mode.\n" // endStatus = EndStatusGet("choose mode.", "exit.");
-               "%d - exit.\n",
-               REPEAT,
-               EXIT);
-
-        endStatus_t endStatus = END_STATUS_WRONG;
-        
+        endStatus_t endStatus = EndStatusGet("choose mode.", "exit.");
+        if (endStatus == EXIT)
+            break;
     }
 
+    ColoredPrintf(WHITE, "Goodbye!\n");
     BinTreeDelete(&akinator.binTree, __AkinatorStringDelete);
 }
 
 
 //--------------------------------------------------------------------------------------------------
 
-// TODO enum
-// TODO change name
+
 static int CompareObjects(const void* firstObject, const void* secondObject)
 {
     printf("Is it %s?\n"
@@ -103,19 +88,14 @@ static int CompareObjects(const void* firstObject, const void* secondObject)
            *((const char**) secondObject));
     
     // TODO think scanf("%c ");
-    char answer = (char) getchar();
-
-    char tempChar = (char) getchar(); // to skip '\n', // TODO: add skipping spaces
-    // printf(">~~~ %c [%d]\n\n", tempChar, tempChar);
+    int answer = getchar();
+    SkipSpaces();
 
     if (answer == 'Y')
-        return 0;
-
-    if (answer == (char) EOF)
-        printf("EOF\n");
+        return EQUAL;
     
     // printf("> %c [%d]\n\n", answer, answer);
-    return -1;
+    return LESS;
 }
 
 
@@ -128,8 +108,6 @@ static inline void __AkinatorStringDelete(void* akinatorStringPtr)
 // TODO
 static akinatorMode_t AkinatorGetMode()
 {
-    printf("Choose mode:\n");
-
     for (;;)
     {
         printf("%d - guess your objects.\n"
@@ -140,11 +118,15 @@ static akinatorMode_t AkinatorGetMode()
                AKINATOR_GET_DEFINITION);
 
         akinatorMode_t mode = AKINATOR_WRONG_MODE;
-        scanf("%d", &mode);
+        scanf("%d", (int*) &mode);
+        SkipSpaces();
+        printf("\n");
+
         if (mode > AKINATOR_WRONG_MODE && mode < AKINATOR_MODE_COUNT)
             return mode;
         else
             printf("You wrote wrong mode. Try choose again.\n");
+        
     }
 }
 
@@ -162,9 +144,10 @@ static void AkinatorRunMode(Akinator* akinator)
         break;
 
     case AKINATOR_GET_DEFINITION:
-        AkinatorRunDefine(akinator);
+        AkinatorRunGetDefinition(akinator);
         break;
 
+    case AKINATOR_MODE_COUNT:
     case AKINATOR_WRONG_MODE:
     default:
         ColoredPrintf(RED, "Wrong mode: %d\n", akinator->mode);
@@ -180,8 +163,14 @@ static void AkinatorRunGuess(Akinator* akinator)
 
     for (;;)
     {
-        if (!AkinatorGuess(akinator))
-            return;
+        AkinatorGuess(akinator);
+
+        printf("\n");
+        endStatus_t endStatus = EndStatusGet("repeat.", "choose other mode.");
+        if (endStatus == EXIT)
+            break;
+        
+        printf("\n");
     }
 }
 
@@ -194,7 +183,7 @@ static void AkinatorRunCompare(Akinator* akinator)
 
 
 // TODO
-static void AkinatorRunDefine(Akinator* akinator)
+static void AkinatorRunGetDefinition(Akinator* akinator)
 {
 
 }
@@ -204,7 +193,7 @@ static bool AkinatorSetFirstObject(Akinator* akinator)
 {
     ColoredPrintf(WHITE, "Setting first object\n");
 
-    const akinatorObject_t   object = AkinatorObjectGet();
+    const akinatorObject_t   object   = AkinatorObjectGet();
     const akinatorProperty_t property = AkinatorPropertyGet(object);
 
     if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), &property, CompareObjects) ||
@@ -233,7 +222,6 @@ static bool AkinatorGuess(Akinator* akinator)
 }
 
 
-// TODO typedef char* akinatorObject_t; and property_t. I can use inheritance
 // TODO add NULL checkers when I create objects
 // TODO add getting of child object
 static void AkinatorAddObject(Akinator* akinator, BinTreeNode* questionNode)
