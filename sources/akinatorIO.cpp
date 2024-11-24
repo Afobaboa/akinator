@@ -24,7 +24,7 @@ endStatus_t EndStatusGet(const char* repeatDescription, const char* exitDescript
                EXIT,   exitDescription);
 
         endStatus_t endStatus = END_STATUS_WRONG;
-        scanf("%d", (int*) &endStatus);
+        scanf(" %d", (int*) &endStatus);
         if (endStatus > END_STATUS_WRONG && endStatus < END_STATUSES_COUNT)
             return endStatus;
         

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "binTree.h"
 #include "akinator.h"
@@ -37,6 +38,7 @@ static int CompareObjects(const void* firstObjectPtr, const void* secondObjectPt
 static inline int IsObjectsEqual(const void* firstObjectPtr, const void* secondObjectPtr);
 static inline void __AkinatorStringDelete(void* akinatorStringPtr);
 static void PrintObject(const void* objectPtr);
+static void PrintObjectForSave(FILE* file, const void* objectPtr);
 
 static akinatorMode_t AkinatorGetMode();
 
@@ -77,6 +79,7 @@ void AkinatorPlay()
 
     ColoredPrintf(WHITE, "Goodbye!\n");
     // TODO AkinatorDelete(&akinator);
+    BinTreeSaveToFile(akinator.binTree, "akinator.db", PrintObjectForSave);
     BinTreeDelete(&akinator.binTree, __AkinatorStringDelete);
 }
 
@@ -101,13 +104,17 @@ static int CompareObjects(const void* firstObjectPtr, const void* secondObjectPt
     }
 
     int answer = getchar();
+    answer = toupper(answer);
     SkipSpaces();
 
     if (answer == 'Y')
         return EQUAL;
+
+    if (answer == 'N')
+        return LESS;
     
-    // printf("> %c [%d]\n\n", answer, answer);
-    return LESS;
+    printf("You wrote wrong answer. Try again.\n");
+    return CompareObjects(firstObjectPtr, secondObjectPtr);
 }
 
 
@@ -129,6 +136,12 @@ static void PrintObject(const void* objectPtr)
 }
 
 
+static void PrintObjectForSave(FILE* file, const void* objectPtr)
+{
+    fprintf(file, "%s", *((const akinatorObject_t*) objectPtr));
+}
+
+
 // TODO
 static akinatorMode_t AkinatorGetMode()
 {
@@ -143,8 +156,7 @@ static akinatorMode_t AkinatorGetMode()
 
         akinatorMode_t mode = AKINATOR_WRONG_MODE;
         scanf(" %d", (int*) &mode);
-        // SkipSpaces();
-        printf("Successfully got it!\n");
+        SkipSpaces();
 
         if (mode > AKINATOR_WRONG_MODE && mode < AKINATOR_MODE_COUNT)
             return mode;
@@ -229,16 +241,39 @@ static void AkinatorRunGetDefinition(Akinator* akinator)
 }
 
 
+//!!!!!!!!!!!!!!!!!!!!?????!?!?!!?!?!
+static bool AkinatorStringInit(const char* valueString, void* valueBuffer)
+{
+    akinatorString_t string = (akinatorString_t) calloc(128, sizeof(char));
+    if (string == NULL)
+        return false;
+
+    memmove(string, valueString, 128);
+    *((akinatorString_t*) valueBuffer) = string;
+
+    return true;
+}
+
+
 static bool AkinatorSetFirstObject(Akinator* akinator)
 {
-    ColoredPrintf(WHITE, "Setting first object\n");
+    // ColoredPrintf(WHITE, "Setting first object\n");
 
-    const akinatorObject_t   object   = AkinatorObjectGet();
-    const akinatorProperty_t property = AkinatorPropertyGet(object);
+    // const akinatorObject_t   object   = AkinatorObjectGet();
+    // const akinatorProperty_t property = AkinatorPropertyGet(object);
 
-    if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), &property, CompareObjects) ||
-        !BinTreeInsert(akinator->binTree, &object, CompareObjects))
+    // if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), &property, CompareObjects) ||
+    //     !BinTreeInsert(akinator->binTree, &object, CompareObjects))
+    // {
+    //     return false;
+    // }
+
+    ColoredPrintf(WHITE, "Initing from data base...\n");
+
+    if (!BIN_TREE_INIT_FROM_FILE(&akinator->binTree, sizeof(akinatorString_t), "akinator.db", 
+                                 AkinatorStringInit, __AkinatorStringDelete))
     {
+        ColoredPrintf(RED, "ERROR in initng.\n");
         return false;
     }
 
