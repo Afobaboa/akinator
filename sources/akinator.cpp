@@ -211,10 +211,31 @@ static void AkinatorRunGuess(Akinator* akinator)
 }
 
 
+// TODO not declared
+static void PrintPropertyInCompare(const void* objectPtr, const void* propertyPtr)
+{
+    if (objectPtr == NULL)
+        printf("They are %s.\n", *((akinatorProperty_t*) propertyPtr));
+    else
+        printf("!!!Only %s is %s.\n", *((akinatorObject_t*) objectPtr), 
+                                  *((akinatorProperty_t*) propertyPtr));
+}
+
+
 // TODO
 static void AkinatorRunCompare(Akinator* akinator)
 {
+    akinatorObject_t firstObject  = AkinatorObjectGet();
+    akinatorObject_t secondObject = AkinatorObjectGet();
 
+    if (!BinTreeCompareValues(akinator->binTree, &firstObject, &secondObject, 
+                              IsObjectsEqual, PrintPropertyInCompare))
+    {
+        printf("I can't compare this objects.\n");
+    }
+
+    AkinatorStringDelete(firstObject);
+    AkinatorStringDelete(secondObject);
 }
 
 
@@ -241,7 +262,7 @@ static void AkinatorRunGetDefinition(Akinator* akinator)
 }
 
 
-//!!!!!!!!!!!!!!!!!!!!?????!?!?!!?!?!
+// TODO not declared!!!!!!!!!!!!!!!!!!!!?????!?!?!!?!?!
 static bool AkinatorStringInit(const char* valueString, void* valueBuffer)
 {
     akinatorString_t string = (akinatorString_t) calloc(128, sizeof(char));
