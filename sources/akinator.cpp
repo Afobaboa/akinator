@@ -40,6 +40,9 @@ static inline void __AkinatorStringDelete(void* akinatorStringPtr);
 static void PrintObject(const void* objectPtr);
 static void PrintObjectForSave(FILE* file, const void* objectPtr);
 
+static bool AkinatorInit(Akinator* akinator, );
+static bool AkinatorDelete(Akinator* akinator);
+
 static akinatorMode_t AkinatorGetMode();
 
 static void AkinatorRunMode(Akinator* akinator);
@@ -47,7 +50,7 @@ static void AkinatorRunMode(Akinator* akinator);
 static void AkinatorRunGuess(Akinator* akinator);
 static void AkinatorRunCompare(Akinator* akinator);
 static void AkinatorRunGetDefinition(Akinator* akinator);
-// TODO change name
+
 
 static bool AkinatorSetFirstObject(Akinator* akinator);
 static bool AkinatorGuess(Akinator* akinator);
@@ -60,8 +63,6 @@ static void AkinatorAddObject(Akinator* akinator, BinTreeNode* questionNode);
 
 void AkinatorPlay()
 {
-    setvbuf(stdin, NULL, _IONBF, 0);
-
     ColoredPrintf(WHITE, "It is Akinator!\n");
     Akinator akinator = {};
     
@@ -139,6 +140,22 @@ static void PrintObject(const void* objectPtr)
 static void PrintObjectForSave(FILE* file, const void* objectPtr)
 {
     fprintf(file, "%s", *((const akinatorObject_t*) objectPtr));
+}
+
+
+static bool AkinatorInit(Akinator* akinator)
+{
+    if (!BinTreeInitFromFile(&akinator->binTree, sizeof(akinatorString_t), "akinator.db",
+                             AkinatorStringInit, __AkinatorStringDelete));
+    {
+        AkinatorSetFirstObject(akinator);
+    }
+}
+
+
+static bool AkinatorDelete(Akinator* akinator)
+{
+
 }
 
 
@@ -222,7 +239,7 @@ static void PrintPropertyInCompare(const void* objectPtr, const void* propertyPt
 }
 
 
-// TODO
+
 static void AkinatorRunCompare(Akinator* akinator)
 {
     akinatorObject_t firstObject  = AkinatorObjectGet();
@@ -280,23 +297,23 @@ static bool AkinatorSetFirstObject(Akinator* akinator)
 {
     // ColoredPrintf(WHITE, "Setting first object\n");
 
-    // const akinatorObject_t   object   = AkinatorObjectGet();
-    // const akinatorProperty_t property = AkinatorPropertyGet(object);
+    const akinatorObject_t   object   = AkinatorObjectGet();
+    const akinatorProperty_t property = AkinatorPropertyGet(object);
 
-    // if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), &property, CompareObjects) ||
-    //     !BinTreeInsert(akinator->binTree, &object, CompareObjects))
-    // {
-    //     return false;
-    // }
-
-    ColoredPrintf(WHITE, "Initing from data base...\n");
-
-    if (!BIN_TREE_INIT_FROM_FILE(&akinator->binTree, sizeof(akinatorString_t), "akinator.db", 
-                                 AkinatorStringInit, __AkinatorStringDelete))
+    if (!BIN_TREE_INIT(&akinator->binTree, sizeof(char*), &property, CompareObjects) ||
+        !BinTreeInsert(akinator->binTree, &object, CompareObjects))
     {
-        ColoredPrintf(RED, "ERROR in initng.\n");
         return false;
     }
+
+    // ColoredPrintf(WHITE, "Initing from data base...\n");
+
+    // if (!BIN_TREE_INIT_FROM_FILE(&akinator->binTree, sizeof(akinatorString_t), "akinator.db", 
+    //                              AkinatorStringInit, __AkinatorStringDelete))
+    // {
+    //     ColoredPrintf(RED, "ERROR in initng.\n");
+    //     return false;
+    // }
 
     return true;
 }
